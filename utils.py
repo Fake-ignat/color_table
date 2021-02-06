@@ -59,23 +59,28 @@ def get_ids(st_names, filename):
                     ids.append((st_id, station_name))
     return ids
 
+
+def get_regions(filename):
+    regions = {}
+    with open(filename, 'r') as f:
+        regions = json.load(f)
+    return regions
+
 def get_rus_ids(st_names, filename):
     ids = []
+    regions = get_regions(filename)
     for target_name in st_names:
         # target_region = None
         # if '-' in target_name:
         #     target_region, target_name = map(lambda x: x.strip, target_name.split('-'))
-
-        with open(filename, 'r') as f:
-            stations_ids = json.load(f)
-            for region, stations in stations_ids.items():
-                # if target_region:
-                #     if target_region not in region:
-                #         continue
-                for station in stations:
-                    if target_name in station:
-                        id = stations[station]
-                        ids.append((id, f'{region} - {station}'))
+        for region, stations in regions.items():
+            # if target_region:
+            #     if target_region not in region:
+            #         continue
+            for station in stations:
+                if target_name in station:
+                    id = stations[station]
+                    ids.append((id, f'{region} - {station}'))
     return ids
 
 

@@ -1,5 +1,6 @@
 import xlsxwriter as xl
 import statistics as stat
+import os
 from bs4 import BeautifulSoup
 from constants import THIS_YEAR, FIRST_YEAR, LAST_YEAR, DEFAULT_MONTHS, MONTHS, USERNAME, PASSWORD
 from utils import create_default_buffer, create_browser, merge_cells, write_1st_col, apply_conditional_format, \
@@ -66,6 +67,7 @@ class TableLoader:
         return date, (t, p, h)
 
     def get_soup(self, year, station_id, station_name):
+        html = ''
         try:
             html = self.br.open(f'{TableLoader.url}&y={year}&id={station_id}')
         except Exception as e:
@@ -111,6 +113,8 @@ class TableLoader:
             self.data[cur_month_year] = values
 
     def save_as_excel(self, st_name):
+        if not os.path.exists('Таблицы'):
+            os.mkdir('Таблицы')
         # создаем книгу Excel
         wb = xl.Workbook(f'Таблицы/Цветная таблица {st_name} {FIRST_YEAR}-{LAST_YEAR}.xlsx')
         ws = wb.add_worksheet('Средние показатели')

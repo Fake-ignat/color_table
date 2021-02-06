@@ -1,3 +1,5 @@
+import os
+
 # MONTHS = ["ЯНВАРЬ", "ФЕВРАЛЬ", "МАРТ", "АПРЕЛЬ", "МАЙ", "ИЮНЬ",
 #           "ИЮЛЬ", "АВГУСТ", "СЕНТЯБРЬ", "ОКТЯБРЬ", "НОЯБРЬ", "ДЕКАБРЬ"]
 #
@@ -21,12 +23,13 @@ MERGE_FORMAT = {'bold': 1, 'align': 'center', 'valign': 'vcenter'}
 TEMP_FORMAT = {'num_format': '# ##0', 'align': 'center', 'valign': 'vcenter'}
 PREP_SNOW_FORMAT = {'align': 'center', 'valign': 'vcenter'}
 
-# target_names = ['Чарышское']
-target_names = ['Алдан', 'Амга', 'Белая Гора', 'Усть-Куйга', 'Великий Устюг', 'Ишим', 'Чарышское', 'Зырянка', 'Ленск',
-                'Усть-Цильма', 'Черлак']
+target_names = ['Чарышское']
+# target_names = ['Алдан', 'Амга', 'Белая Гора', 'Усть-Куйга', 'Великий Устюг', 'Ишим', 'Чарышское', 'Зырянка', 'Ленск',
+#                 'Усть-Цильма', 'Черлак']
 
 # kz_target_names = ['Петропавловск', 'Кокшетау', 'Рузаевка', 'Павлодар']
-kz_target_names = ['Кокшетау', 'Рузаевка', 'Павлодар']
+kz_target_names = ['Рузаевка']
 
-STATION_LIST_DIR_RU = './stations/station_ids full.json'
-STATION_LIST_DIR_KZ = './stations/kz_station_ids.json'
+ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+STATION_LIST_DIR_RU = f'{ROOT_DIR}/stations/station_ids full.json'
+STATION_LIST_DIR_KZ = f'{ROOT_DIR}/stations/kz_station_ids.json'
