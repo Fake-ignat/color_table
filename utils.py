@@ -60,15 +60,15 @@ def get_ids(st_names, filename):
     return ids
 
 
-def get_regions(filename):
-    regions = {}
+def load_data(filename):
+    data = {}
     with open(filename, 'r') as f:
-        regions = json.load(f)
-    return regions
+        data = json.load(f)
+    return data
 
 def get_rus_ids(st_names, filename):
     ids = []
-    regions = get_regions(filename)
+    regions = load_data(filename)
     for target_name in st_names:
         # target_region = None
         # if '-' in target_name:
