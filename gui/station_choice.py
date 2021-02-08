@@ -7,13 +7,14 @@ from PyQt5.QtCore import pyqtSignal
 class StationChoice(QWidget):
     closing = pyqtSignal(dict)
 
-    def __init__(self, name, stations):
+    def __init__(self, name, stations, state):
         super().__init__()
-        self.stations = stations
-        self.init_ui()
-
         self.name = name
-        self.state = self.clear_state()
+        self.stations = stations
+        self.state = state
+
+        self.init_ui()
+        self.render_checkBoxes()
 
         self.setWindowTitle(f'Метеостанции {self.name}')
         self.setMinimumWidth(470)
@@ -44,42 +45,47 @@ class StationChoice(QWidget):
 
     def closeEvent(self, event: QCloseEvent):
         try:
-            self.closing.emit(self.emit_state())
+            self.closing.emit(self.send_state())
             return super().closeEvent(event)
         except Exception as e:
-            print(e)
+            print("Station closeEvent",e)
 
     def on_btn_OK_clicked(self):
-        self.state = self.clear_state()
         self.update_state()
 
     def clear_state(self):
-        return {
+        self.state = {
             "stations": {},
             "isChecked": 0
         }
 
+    def render_checkBoxes(self):
+        for checkBox in self.findChildren(QCheckBox):
+            name = checkBox.text()
+            if name in self.state['stations']:
+                checkBox.setChecked(True)
+            else:
+                checkBox.setChecked(False)
+
     def update_state(self):
+        self.clear_state()
+
         checkboxes = self.findChildren(QCheckBox)
         full_size = len(checkboxes)
 
-        for checkbox in checkboxes:
-            if checkbox.checkState():
-                name = checkbox.text()
+        for checkBox in checkboxes:
+            if checkBox.checkState():
+                name = checkBox.text()
                 id = self.stations[name]
 
-                self.state["stations"][name] = id
+                self.state['stations'][name] = id
 
-            now_size = len(self.state["stations"])
+            now_size = len(self.state['stations'])
             if now_size:
-                self.state["isChecked"] = 2 if full_size == now_size else 1
+                self.state['isChecked'] = 2 if full_size == now_size else 1
 
-    def emit_state(self):
-        if self.state["isChecked"]:
-            return {
-                self.name: self.state
-            }
-        return {}
+    def send_state(self):
+            return {self.name: self.state}
 
 
 
