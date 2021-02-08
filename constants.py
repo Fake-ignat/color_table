@@ -23,7 +23,7 @@ MERGE_FORMAT = {'bold': 1, 'align': 'center', 'valign': 'vcenter'}
 TEMP_FORMAT = {'num_format': '# ##0', 'align': 'center', 'valign': 'vcenter'}
 PREP_SNOW_FORMAT = {'align': 'center', 'valign': 'vcenter'}
 
-target_names = ['Чарышское']
+# target_names = ['Чарышское']
 # target_names = ['Алдан', 'Амга', 'Белая Гора', 'Усть-Куйга', 'Великий Устюг', 'Ишим', 'Чарышское', 'Зырянка', 'Ленск',
 #                 'Усть-Цильма', 'Черлак']
 

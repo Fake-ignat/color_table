@@ -1,9 +1,10 @@
 # coding:cp1251
-
+from utils import load_data, create_browser
 from mechanize import Browser
 from bs4 import BeautifulSoup
-from constants import (STATION_LIST_DIR_KZ, STATION_LIST_DIR_RU)
-import os, json
+from constants import (STATION_LIST_DIR_KZ, STATION_LIST_DIR_RU, ROOT_DIR, USERNAME, PASSWORD)
+import re, json
+
 
 class Finder():
     def __init__(self, country='RU'):
@@ -93,4 +94,66 @@ class Finder():
             json.dump(self.station_ids, f, indent=2, ensure_ascii=False)
 
 
-Finder('RU').save_station_list()
+class Coordinator():
+    def __init__(self):
+        self.regions = load_data(STATION_LIST_DIR_RU)
+        print(self.regions)
+        self.br = create_browser()
+        self.login()
+        self.update_regions()
+
+    def get_URL(self, id):
+        return f'http://www.pogodaiklimat.ru/summary/{id}.htm'
+
+    def login(self):
+        try:
+            self.br.open("http://www.pogodaiklimat.ru/login.php")
+        except:
+            print("[!]Critical, could not open page.")
+        self.br.form = list(self.br.forms())[0]
+        self.br["username"] = USERNAME
+        self.br["password"] = PASSWORD
+        self.br.submit()
+
+    def get_tag_text(self, url, tag):
+        html = self.br.open(url)
+        soup = BeautifulSoup(html, "lxml")
+        h2 = soup.find(tag)
+        return h2.text
+
+    def parse_coords(self, text):
+        pattern = r'(\d{2}.\d{2})°[шд]'
+        match = re.findall(pattern, text)
+        lat = match[0] if match else None
+        long = match[1] if match else None
+        lat, long = self.convert_coord(map(float, (lat, long)))
+        return lat, long
+
+    def convert_coord(self, coords):
+        return map(lambda x:
+                   round(
+                       int(x) + (x - int(x)) / 60,
+                       5),
+                   coords)
+
+    def updated_station_data(self, id):
+        url = self.get_URL(id)
+        text = self.get_tag_text(url, 'h2')
+        coord = self.parse_coords(text)
+        return dict(id=id, coord=coord)
+
+    def update_regions(self):
+        for region, station_data in self.regions.items():
+            for station, id in station_data.items():
+                print(f'{region} - {station}')
+                new_data = self.updated_station_data(id)
+                self.regions[region][station] = new_data
+
+    def save_data(self):
+        filename = f'{ROOT_DIR}/stations/ru_meteost_coords.json'
+        with open(filename, 'w') as f:
+            json.dump(self.regions, f, indent=2, ensure_ascii=False)
+
+
+coordinator = Coordinator()
+coordinator.save_data()

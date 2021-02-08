@@ -1,16 +1,1 @@
-{
-  "Казахстан": {
-    "Валакхия": {
-      "isChosen": true
-    }
-  },
-  "Россия": {
-    "Гиперборея": {
-      "station": {
-        "name": "Тест",
-        "isChosen": true
-      },
-      "isChosen": "Partly"
-    }
-  }
-}
+{"Казахстан": {"Валакхия": {"isChosen": true}}, "Россия": {"Гиперборея": {"station": {"name": "Тест", "isChosen": true}, "isChosen": "Partly"}}}

@@ -68,8 +68,7 @@ class StationChoice(QWidget):
                 name = checkbox.text()
                 id = self.stations[name]
 
-                station_state = dict(isChecked=2, id=id)
-                self.state["stations"][name] = station_state
+                self.state["stations"][name] = id
 
             now_size = len(self.state["stations"])
             if now_size:
