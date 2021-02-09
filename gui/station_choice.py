@@ -1,17 +1,21 @@
-from gui.gui_helper import separator, create_ok_cancel_btnBox, pretty
+from gui.gui_helper import separator, create_ok_cancel_btnBox, copy_dict
 from PyQt5.QtWidgets import (QCheckBox, QHBoxLayout, QVBoxLayout, QWidget)
 from PyQt5.QtGui import QCloseEvent
 from PyQt5.QtCore import pyqtSignal
 
 
 class StationChoice(QWidget):
-    closing = pyqtSignal(dict)
+    closing = pyqtSignal()
+    default_state = {"stations": {}, "isChecked": 0}
 
-    def __init__(self, name, stations, state):
+    def __init__(self, name, stations, parent):
         super().__init__()
+        self.parent = parent
         self.name = name
         self.stations = stations
-        self.state = state
+        self.state = parent.state[name] \
+            if name in parent.state \
+            else copy_dict(self.default_state)
 
         self.init_ui()
         self.render_checkBoxes()
@@ -45,19 +49,18 @@ class StationChoice(QWidget):
 
     def closeEvent(self, event: QCloseEvent):
         try:
-            self.closing.emit(self.send_state())
+            self.modify_parent_state()
+            self.closing.emit()
             return super().closeEvent(event)
         except Exception as e:
             print("Station closeEvent",e)
 
     def on_btn_OK_clicked(self):
+        self.clear_state()
         self.update_state()
 
     def clear_state(self):
-        self.state = {
-            "stations": {},
-            "isChecked": 0
-        }
+        self.state = copy_dict(self.default_state)
 
     def render_checkBoxes(self):
         for checkBox in self.findChildren(QCheckBox):
@@ -68,24 +71,26 @@ class StationChoice(QWidget):
                 checkBox.setChecked(False)
 
     def update_state(self):
-        self.clear_state()
+        checkBoxes = self.findChildren(QCheckBox)
+        full_size = len(checkBoxes)
 
-        checkboxes = self.findChildren(QCheckBox)
-        full_size = len(checkboxes)
-
-        for checkBox in checkboxes:
+        for checkBox in checkBoxes:
             if checkBox.checkState():
-                name = checkBox.text()
-                id = self.stations[name]
+                st_name = checkBox.text()
+                id = self.stations[st_name]
 
-                self.state['stations'][name] = id
+                self.state['stations'][st_name] = id
 
             now_size = len(self.state['stations'])
             if now_size:
                 self.state['isChecked'] = 2 if full_size == now_size else 1
 
-    def send_state(self):
-            return {self.name: self.state}
+    def modify_parent_state(self):
+        if self.state['isChecked']:
+            self.parent.state[self.name] = self.state
+        else:
+            if self.name in self.parent.state:
+                self.parent.state.pop(self.name)
 
 
 

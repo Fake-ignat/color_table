@@ -1,14 +1,41 @@
+# coding: utf-8
 from PyQt5.QtWidgets import (QCheckBox, QHBoxLayout, QPushButton, QSizePolicy)
 
+
 class MyHBox(QHBoxLayout):
-    def __init__(self, parent, region, station_state):
+    def __init__(self, parent, region):
         super().__init__()
+        self.parent = parent
         self.name = region
+        self.stations = parent.regions[region]
+
         self.checkBox = QCheckBox()
         self.checkBox.setTristate(True)
+        self.checkBox.clicked.connect(self.on_cb_clicked)
         self.addWidget(self.checkBox)
+
         btn = QPushButton(region)
-        stations = parent.regions[region]
-        btn.clicked.connect(lambda: parent.on_clicked(region, stations, station_state))
+        btn.clicked.connect(lambda:
+                            self.parent.on_station_choice_clicked(region, self.stations))
         btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         self.addWidget(btn)
+
+    def on_cb_clicked(self):
+        if self.checkBox.checkState() == 2:
+            self.check_all()
+
+        if self.checkBox.checkState() == 1:
+            self.checkBox.setCheckState(2)
+            self.check_all()
+
+        if self.checkBox.checkState() == 0:
+            self.uncheck_all()
+
+    def check_all(self):
+        self.parent.state[self.name] = {
+            "stations": self.stations,
+            "isChecked": 2
+        }
+
+    def uncheck_all(self):
+        self.parent.state.pop(self.name)

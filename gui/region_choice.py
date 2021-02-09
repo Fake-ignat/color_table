@@ -3,7 +3,7 @@ import sys
 from utils import load_data
 from constants import STATION_LIST_DIR_RU as filename
 
-from gui.gui_helper import separator, create_ok_cancel_btnBox
+from gui.gui_helper import separator, create_ok_cancel_btnBox, copy_dict
 from gui.myHBox import MyHBox
 from gui.station_choice import StationChoice
 
@@ -35,10 +35,7 @@ class RegionChoice(QWidget):
         layout = QHBoxLayout()
         vBox = QVBoxLayout()
         for region in self.regions:
-            st_state = self.state[region] \
-                if region in self.state \
-                else dict(stations={}, isChecked=0)
-            vBox.addLayout(MyHBox(self, region, st_state))
+            vBox.addLayout(MyHBox(self, region))
             if vBox.count() >= 13:
                 layout.addLayout(vBox)
                 layout.addWidget(separator('V'))
@@ -50,10 +47,10 @@ class RegionChoice(QWidget):
         self.closing.emit()
         return super().closeEvent(event)
 
-    def on_clicked(self, name, stations, small_state):
+    def on_station_choice_clicked(self, name, stations):
         try:
-            self.station_choice = StationChoice(name, stations, small_state)
-            self.station_choice.closing.connect(self.on_close)
+            self.station_choice = StationChoice(name, stations, self)
+            self.station_choice.closing.connect(self.on_st_choice_close)
             self.station_choice.show()
             self.hide()
         except Exception as e:
@@ -62,22 +59,9 @@ class RegionChoice(QWidget):
     def on_btn_OK_clicked(self):
         pass
 
-    def on_close(self, data):
-        self.show()
-        try:
-            self.update_state(data)
-        except Exception as e:
-            print(e)
-
-    def update_state(self, new_data):
-        for name, v in new_data.items():
-            if v["isChecked"]:
-                self.state = {**self.state, **new_data}
-            else:
-                self.state.pop(name)
-
-
+    def on_st_choice_close(self):
         self.render_checkBoxes()
+        self.show()
 
     def render_checkBoxes(self):
         for hBoxes in self.findChildren(MyHBox):
