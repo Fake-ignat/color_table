@@ -1,7 +1,7 @@
 import sys
 
-from utils import load_data
-from constants import STATION_LIST_DIR_RU as filename
+from logic.utils import load_data
+from logic.constants import STATION_LIST_DIR_RU as filename
 
 from gui.gui_helper import separator, create_ok_cancel_btnBox
 from gui.myHBox import MyHBox

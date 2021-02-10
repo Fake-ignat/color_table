@@ -1,7 +1,7 @@
 # coding: utf-8
 import json
-from utils import load_data
-from constants import ROOT_DIR
+from logic.utils import load_data
+from logic.constants import ROOT_DIR
 
 
 class State_Holder():
