@@ -21,14 +21,11 @@ class MyHBox(QHBoxLayout):
         self.addWidget(btn)
 
     def on_cb_clicked(self):
-        if self.checkBox.checkState() == 2:
-            self.check_all()
-
-        if self.checkBox.checkState() == 1:
+        if self.checkBox.checkState():
             self.checkBox.setCheckState(2)
             self.check_all()
 
-        if self.checkBox.checkState() == 0:
+        else:
             self.uncheck_all()
 
     def check_all(self):

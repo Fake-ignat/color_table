@@ -1,12 +1,14 @@
-from gui.gui_helper import separator, create_ok_cancel_btnBox, copy_dict
+from gui.gui_helper import separator, create_ok_cancel_btnBox
 from PyQt5.QtWidgets import (QCheckBox, QHBoxLayout, QVBoxLayout, QWidget)
 from PyQt5.QtGui import QCloseEvent
 from PyQt5.QtCore import pyqtSignal
+from copy import deepcopy
 
 
 class StationChoice(QWidget):
     closing = pyqtSignal()
     default_state = {"stations": {}, "isChecked": 0}
+
 
     def __init__(self, name, stations, parent):
         super().__init__()
@@ -15,7 +17,7 @@ class StationChoice(QWidget):
         self.stations = stations
         self.state = parent.state[name] \
             if name in parent.state \
-            else copy_dict(self.default_state)
+            else deepcopy(self.default_state)
 
         self.init_ui()
         self.render_checkBoxes()
@@ -58,9 +60,10 @@ class StationChoice(QWidget):
     def on_btn_OK_clicked(self):
         self.clear_state()
         self.update_state()
+        self.close()
 
     def clear_state(self):
-        self.state = copy_dict(self.default_state)
+        self.state = deepcopy(self.default_state)
 
     def render_checkBoxes(self):
         for checkBox in self.findChildren(QCheckBox):
@@ -91,12 +94,3 @@ class StationChoice(QWidget):
         else:
             if self.name in self.parent.state:
                 self.parent.state.pop(self.name)
-
-
-
-import sys
-
-# app = QApplication(sys.argv)
-# choice = StationChoice(region, stations)
-# choice.show()
-# sys.exit(app.exec_())

@@ -1,7 +1,6 @@
 # coding: utf-8
 from PyQt5.QtWidgets import (QHBoxLayout, QPushButton, QSizePolicy, QFrame)
 from PyQt5 import QtCore
-import ast
 
 
 def create_ok_cancel_btnBox(ok_action=None, cancel_action=None):
@@ -29,8 +28,3 @@ def separator(orient='V'):
     if orient == 'H':
         line.setFrameStyle(4)
     return line
-
-
-def copy_dict(origin_dict):
-    string_origin = str(origin_dict)
-    return ast.literal_eval(string_origin)

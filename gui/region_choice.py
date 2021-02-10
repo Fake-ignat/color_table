@@ -3,7 +3,7 @@ import sys
 from utils import load_data
 from constants import STATION_LIST_DIR_RU as filename
 
-from gui.gui_helper import separator, create_ok_cancel_btnBox, copy_dict
+from gui.gui_helper import separator, create_ok_cancel_btnBox
 from gui.myHBox import MyHBox
 from gui.station_choice import StationChoice
 
@@ -14,11 +14,17 @@ from PyQt5.QtGui import QCloseEvent
 class RegionChoice(QWidget):
     closing = pyqtSignal()
 
-    def __init__(self, state):
+    def __init__(self, name, parent):
         super().__init__()
-        self.state = state
-        self.setWindowTitle('Метеостанции РФ: Субъекты')
+
+        self.name = name
+        self.parent = parent
+        self.state = parent.state[name] \
+            if name in parent.state \
+            else {}
         self.regions = load_data(filename)
+
+        self.setWindowTitle('Метеостанции РФ: Субъекты')
         self.init_ui()
         self.render_checkBoxes()
         self.move(200, 250)
@@ -57,7 +63,8 @@ class RegionChoice(QWidget):
             print(e)
 
     def on_btn_OK_clicked(self):
-        pass
+        self.modify_parent_state()
+        self.close()
 
     def on_st_choice_close(self):
         self.render_checkBoxes()
@@ -71,6 +78,9 @@ class RegionChoice(QWidget):
                 hBoxes.checkBox.setCheckState(isChecked)
             else:
                 hBoxes.checkBox.setCheckState(0)
+
+    def modify_parent_state(self):
+        self.parent.state[self.name] = self.state
 
 test_state = {
     'Смоленская область': dict(stations={

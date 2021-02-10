@@ -21,11 +21,12 @@ class State_Holder():
             json.dump(self.appState, f,  ensure_ascii=False)
 
 
-state_holder = State_Holder()
-data = {
-    "Казахстан": {
-        "Валакхия": {
-            "isChosen": True
-        }}}
-state_holder.update_state(data)
-state_holder.save_state()
+if __name__ == '__main__':
+    state_holder = State_Holder()
+    data = {
+        "Казахстан": {
+            "Валакхия": {
+                "isChosen": True
+            }}}
+    state_holder.update_state(data)
+    state_holder.save_state()
