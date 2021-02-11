@@ -2,7 +2,7 @@ import xlsxwriter as xl
 import statistics as stat
 import os
 from bs4 import BeautifulSoup
-from logic.constants import THIS_YEAR, FIRST_YEAR, LAST_YEAR, DEFAULT_MONTHS, MONTHS, USERNAME, PASSWORD
+from logic.constants import THIS_YEAR, FIRST_YEAR, LAST_YEAR, DEFAULT_MONTHS, MONTHS, USERNAME, PASSWORD, ROOT_DIR
 from logic.utils import create_default_buffer, create_browser, merge_cells, write_1st_col, apply_conditional_format, \
     cell_formats, write_data
 
@@ -101,7 +101,7 @@ class TableLoader:
 
                     self.data[m_y_date] = (av_temp, sum_prep, max_snow)
 
-    def load_all(self, station_id, station_name):
+    def load_all(self, station_name, station_id):
         for y in self.years:
             if y > THIS_YEAR:
                 continue
@@ -116,7 +116,7 @@ class TableLoader:
         if not os.path.exists('Таблицы'):
             os.mkdir('Таблицы')
         # создаем книгу Excel
-        wb = xl.Workbook(f'Таблицы/Цветная таблица {st_name} {FIRST_YEAR}-{LAST_YEAR}.xlsx')
+        wb = xl.Workbook(f'{ROOT_DIR}/Таблицы/Цветная таблица {st_name} {FIRST_YEAR}-{LAST_YEAR}.xlsx')
         ws = wb.add_worksheet('Средние показатели')
 
         # задаем форматы

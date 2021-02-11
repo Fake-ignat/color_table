@@ -20,13 +20,12 @@ class State_Holder():
         with open(self.filename, 'w') as f:
             json.dump(self.appState, f,  ensure_ascii=False)
 
-
-if __name__ == '__main__':
-    state_holder = State_Holder()
-    data = {
-        "Казахстан": {
-            "Валакхия": {
-                "isChosen": True
-            }}}
-    state_holder.update_state(data)
-    state_holder.save_state()
+    def chosen_ids_RU(self):
+        result = []
+        if 'РФ' in self.appState:
+            regions = self.appState['РФ']
+            for region, vals in regions.items():
+                stations = vals['stations']
+                for name, st_id in stations.items():
+                    result.append((f'{region}-{name}', st_id))
+        return result

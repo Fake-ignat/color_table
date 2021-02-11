@@ -1,4 +1,4 @@
-import os
+from os.path import abspath, split, dirname
 
 # MONTHS = ["ЯНВАРЬ", "ФЕВРАЛЬ", "МАРТ", "АПРЕЛЬ", "МАЙ", "ИЮНЬ",
 #           "ИЮЛЬ", "АВГУСТ", "СЕНТЯБРЬ", "ОКТЯБРЬ", "НОЯБРЬ", "ДЕКАБРЬ"]
@@ -6,9 +6,7 @@ import os
 # DEFAULT_MONTHS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
 
 MONTHS = ["ЯНВАРЬ", "ФЕВРАЛЬ", "МАРТ", "АПРЕЛЬ", "МАЙ",  "НОЯБРЬ", "ДЕКАБРЬ"]
-
 DEFAULT_MONTHS = [1, 2, 3, 4, 5, 11, 12]
-
 
 USERNAME, PASSWORD = ['ncuksods', 'ncuksods']
 
@@ -30,6 +28,7 @@ target_names = ['Алдан', 'Амга', 'Белая Гора', 'Усть-Ку�
 # kz_target_names = ['Петропавловск', 'Кокшетау', 'Рузаевка', 'Павлодар']
 kz_target_names = ['Рузаевка']
 
-ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+this_file_dir = dirname(abspath(__file__))
+ROOT_DIR = split(this_file_dir)[0]
 STATION_LIST_DIR_RU = f'{ROOT_DIR}/stations/station_ids full.json'
 STATION_LIST_DIR_KZ = f'{ROOT_DIR}/stations/kz_station_ids.json'
