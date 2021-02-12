@@ -29,3 +29,12 @@ class State_Holder():
                 for name, st_id in stations.items():
                     result.append((f'{region}-{name}', st_id))
         return result
+
+    def chosen_ids_FOREIGN(self, country):
+        result = []
+        if country in self.appState:
+            stations = self.appState[country]['stations']
+            for name, st_id in stations.items():
+                result.append((f'{country}-{name}', st_id))
+
+        return result

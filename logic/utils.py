@@ -30,8 +30,8 @@ def merge_cells(worksheet, width, height, cell_format, station_name):
 def write_1st_col(worksheet, height, cells_format):
     for i in range(height - 1):
         for block in range(3):
-            col = 3 + i + block * height
-            worksheet.write(col, 0, MONTHS[i], cells_format)
+            line = 3 + i + block * height
+            worksheet.write(line, 0, MONTHS[i], cells_format)
 
 
 def get_conditional_format(i):
