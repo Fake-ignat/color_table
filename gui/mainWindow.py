@@ -16,12 +16,13 @@ class GrandWindow(QWidget):
         super().__init__()
 
         self.holder = State_Holder()
+        self.desktop = desktop
         self.state = self.holder.get_state()
 
         self.ru_choice = RegionChoice('РФ', self)
         self.ru_choice.closing.connect(self.on_subwidget_close)
 
-        self.kz_choice = ForeignChoice("Казахстан", self, desktop)
+        self.kz_choice = ForeignChoice("Казахстан", self)
         self.kz_choice.closing.connect(self.on_subwidget_close)
 
         self.init_ui()

@@ -12,7 +12,7 @@ class ForeignChoice(StationChoice):
 
     stations = load_data(filename)
 
-    def __init__(self, name, parent, desktop):
+    def __init__(self, name, parent):
         super().__init__(name, self.stations, parent)
         self.name = name
         self.parent = parent
@@ -22,7 +22,7 @@ class ForeignChoice(StationChoice):
 
         self.setWindowTitle(f'Метеостанции {self.name}')
         self.move(50, 170)
-        self.setFixedWidth(desktop.width()//2 - 100)
+        self.setFixedWidth(parent.desktop.width()//2 - 100)
         self.init_ui()
 
         self.render_checkBoxes()
