@@ -1,15 +1,6 @@
 import json
 from mechanize import Browser
-from logic.constants import MONTHS, DEFAULT_MONTHS, MERGE_FORMAT, TEMP_FORMAT, PREP_SNOW_FORMAT
-
-
-def create_default_buffer(years):
-    buffer = {}
-    for year in years:
-        for month in DEFAULT_MONTHS:
-            m_y_date = f'{month:02d}.{year}'
-            buffer[m_y_date] = ("Н/Д", "Н/Д", "Н/Д")
-    return buffer
+from logic.constants import MERGE_FORMAT, TEMP_FORMAT, PREP_SNOW_FORMAT
 
 
 def create_browser():
@@ -27,11 +18,11 @@ def merge_cells(worksheet, width, height, cell_format, station_name):
     worksheet.merge_range(2 + 2 * height, 0, 2 + 2 * height, width, "Максимальная высота снега, см", cell_format)
 
 
-def write_1st_col(worksheet, height, cells_format):
+def write_1st_col(worksheet, height, cells_format, month_names):
     for i in range(height - 1):
         for block in range(3):
             line = 3 + i + block * height
-            worksheet.write(line, 0, MONTHS[i], cells_format)
+            worksheet.write(line, 0, month_names[i], cells_format)
 
 
 def get_conditional_format(i):

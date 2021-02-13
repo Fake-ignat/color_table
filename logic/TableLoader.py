@@ -2,30 +2,40 @@ import xlsxwriter as xl
 import statistics as stat
 import os
 from bs4 import BeautifulSoup
-from logic.constants import THIS_YEAR, FIRST_YEAR, LAST_YEAR, DEFAULT_MONTHS, MONTHS, USERNAME, PASSWORD, ROOT_DIR
-from logic.utils import create_default_buffer, create_browser, merge_cells, write_1st_col, apply_conditional_format, \
+from logic.constants import THIS_YEAR, FIRST_YEAR, LAST_YEAR, USERNAME, PASSWORD, ROOT_DIR
+from logic.utils import create_browser, merge_cells, write_1st_col, apply_conditional_format, \
     cell_formats, write_data
 
 
 class TableLoader:
     url = "http://www.pogodaiklimat.ru/msummary.php?m=all"
 
-    def __init__(self, months=None):
+    def __init__(self, holder):
+        self.holder = holder
         self.br = create_browser()
         self.login()
-        # self.stations_ids_and_names = stations_ids_and_names
         self.years = range(FIRST_YEAR, LAST_YEAR + 1)
-        if months is None:
-            self.months = DEFAULT_MONTHS
+        self.month_nums = self.holder.chosen_month_nums()
+        self.month_names = self.holder.chosen_month_names()
 
         self.years = range(FIRST_YEAR, LAST_YEAR + 1)
-        self.data = create_default_buffer(self.years)
+        self.data = self.create_default_buffer()
+        print(self.month_names)
+
+    def create_default_buffer(self):
+        buffer = {}
+        for year in self.years:
+            for month in self.month_nums:
+                m_y_date = f'{month:02d}.{year}'
+                buffer[m_y_date] = ("Н/Д", "Н/Д", "Н/Д")
+        return buffer
 
     def login(self):
         try:
             self.br.open("http://www.pogodaiklimat.ru/login.php")
         except:
             print("[!]Critical, could not open page.")
+
         self.br.form = list(self.br.forms())[0]
         self.br["username"] = USERNAME
         self.br["password"] = PASSWORD
@@ -84,7 +94,7 @@ class TableLoader:
                 collumns = i.find_all('td')
                 m_y_date = collumns[2].text
                 month = int(m_y_date.split('.')[0])
-                if month in self.months:
+                if month in self.month_nums:
                     try:
                         av_temp = float(collumns[3].text)
                     except ValueError:
@@ -123,13 +133,13 @@ class TableLoader:
         formats = cell_formats(wb)
 
         table_width = len(self.years)
-        block_height = len(MONTHS) + 1
+        block_height = len(self.month_names) + 1
 
         # делаем объединенные ячейки
         merge_cells(ws, table_width, block_height, formats[0], st_name)
 
         # пишем первый столбец
-        write_1st_col(ws, block_height, formats[0])
+        write_1st_col(ws, block_height, formats[0], self.month_names)
 
         # пишем строчку с годами
         for i in range(table_width):

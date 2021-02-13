@@ -1,5 +1,5 @@
 # coding: utf-8
-import json
+import json, copy
 from logic.utils import load_data
 from logic.constants import ROOT_DIR
 
@@ -38,3 +38,10 @@ class State_Holder():
                 result.append((f'{country}-{name}', st_id))
 
         return result
+
+    def chosen_month_names(self):
+        return [m for m in self.appState['Месяца']['month_names'].keys()]
+
+    def chosen_month_nums(self):
+        return [m for m in self.appState['Месяца']['month_names'].values()]
+

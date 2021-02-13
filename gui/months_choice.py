@@ -1,27 +1,23 @@
-from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QCheckBox
 
 from gui.station_choice import StationChoice
-from logic.constants import STATION_LIST_DIR_KZ as filename
 from logic.utils import load_data
 
 
-class ForeignChoice(StationChoice):
-    closing = pyqtSignal()
+class MonthsChoice(StationChoice):
+    months = {'ЯНВАРЬ': 1, 'ФЕВРАЛЬ': 2, 'МАРТ': 3, 'АПРЕЛЬ': 4, 'МАЙ': 5, 'ИЮНЬ': 6,
+              'ИЮЛЬ': 7, 'АВГУСТ': 8, 'СЕНТЯБРЬ': 9, 'ОКТЯБРЬ': 10, 'НОЯБРЬ': 11, 'ДЕКАБРЬ': 12}
 
-    base_data = load_data(filename)
-    limit = 50
-    small_col = 12
-    big_col =25
+    limit = 12
+    small_col = 6
+    big_col = 10
 
-    def __init__(self, name, parent):
-        super().__init__(name, self.base_data, parent)
+    def __init__(self, parent):
+        super().__init__("Месяца", self.months, parent, 'month_names')
 
-        self.setWindowTitle(f'Метеостанции {self.name}')
+        self.setWindowTitle(f'Выбор месяца')
         self.move(50, 170)
-        self.setFixedWidth(parent.desktop.width() - 100)
         self.init_ui()
-
         self.render_checkBoxes()
 
     def default_state(self):

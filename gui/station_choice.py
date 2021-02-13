@@ -7,17 +7,23 @@ from copy import deepcopy
 
 class StationChoice(QWidget):
     closing = pyqtSignal()
-    default_state = {"stations": {}, "isChecked": 0}
 
 
-    def __init__(self, name, stations, parent):
+    limit = 50
+    small_col = 12
+    big_col = 25
+
+
+    def __init__(self, name, base_data, parent, choice_key='stations'):
         super().__init__()
         self.parent = parent
         self.name = name
-        self.stations = stations
+        self.base_data = base_data
+        self.choice_key = choice_key
+
         self.state = parent.state[name] \
             if name in parent.state \
-            else deepcopy(self.default_state)
+            else deepcopy(self.default_state())
 
         self.init_ui()
         self.render_checkBoxes()
@@ -37,10 +43,10 @@ class StationChoice(QWidget):
         layout = QHBoxLayout()
         vBox = QVBoxLayout()
 
-        amount = len(self.stations)
-        column_size = 5 if amount <= 50 else 10
+        amount = len(self.base_data)
+        column_size = self.small_col if amount <= self.limit else self.big_col
 
-        for station, id in self.stations.items():
+        for station, id in self.base_data.items():
             vBox.addWidget(QCheckBox(station))
             if vBox.count() >= column_size:
                 layout.addLayout(vBox)
@@ -62,13 +68,16 @@ class StationChoice(QWidget):
         self.update_state()
         self.close()
 
+    def default_state(self):
+        return {self.choice_key: {}, "isChecked": 0}
+
     def clear_state(self):
-        self.state = deepcopy(self.default_state)
+        self.state = deepcopy(self.default_state())
 
     def render_checkBoxes(self):
         for checkBox in self.findChildren(QCheckBox):
             name = checkBox.text()
-            if name in self.state['stations']:
+            if name in self.state[self.choice_key]:
                 checkBox.setChecked(True)
             else:
                 checkBox.setChecked(False)
@@ -80,11 +89,11 @@ class StationChoice(QWidget):
         for checkBox in checkBoxes:
             if checkBox.checkState():
                 st_name = checkBox.text()
-                id = self.stations[st_name]
+                value = self.base_data[st_name]
 
-                self.state['stations'][st_name] = id
+                self.state[self.choice_key][st_name] = value
 
-            now_size = len(self.state['stations'])
+            now_size = len(self.state[self.choice_key])
             if now_size:
                 self.state['isChecked'] = 2 if full_size == now_size else 1
 
