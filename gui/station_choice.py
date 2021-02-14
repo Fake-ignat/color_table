@@ -1,4 +1,4 @@
-from gui.gui_helper import separator, create_ok_cancel_btnBox
+from gui.gui_helper import separator, create_ok_cancel_btnBox, value_from_state
 from PyQt5.QtWidgets import (QCheckBox, QHBoxLayout, QVBoxLayout, QWidget)
 from PyQt5.QtGui import QCloseEvent
 from PyQt5.QtCore import pyqtSignal
@@ -21,9 +21,10 @@ class StationChoice(QWidget):
         self.base_data = base_data
         self.choice_key = choice_key
 
-        self.state = parent.state[name] \
-            if name in parent.state \
-            else deepcopy(self.default_state())
+        self.state = value_from_state(
+            state=parent.state,
+            key=name,
+            default_value=deepcopy(self.default_state()))
 
         self.init_ui()
         self.render_checkBoxes()

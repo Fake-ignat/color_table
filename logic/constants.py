@@ -5,9 +5,6 @@ from datetime import datetime
 USERNAME, PASSWORD = ['ncuksods', 'ncuksods']
 THIS_YEAR = datetime.now().year
 
-FIRST_YEAR = 2010
-LAST_YEAR = 2021
-
 MERGE_FORMAT = {'bold': 1, 'align': 'center', 'valign': 'vcenter'}
 TEMP_FORMAT = {'num_format': '# ##0', 'align': 'center', 'valign': 'vcenter'}
 PREP_SNOW_FORMAT = {'align': 'center', 'valign': 'vcenter'}

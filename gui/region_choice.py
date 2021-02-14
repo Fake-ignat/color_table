@@ -3,7 +3,7 @@ import sys
 from logic.utils import load_data
 from logic.constants import STATION_LIST_DIR_RU as filename
 
-from gui.gui_helper import separator, create_ok_cancel_btnBox
+from gui.gui_helper import separator, create_ok_cancel_btnBox, value_from_state
 from gui.myHBox import MyHBox
 from gui.station_choice import StationChoice
 
@@ -19,9 +19,7 @@ class RegionChoice(QWidget):
 
         self.name = name
         self.parent = parent
-        self.state = parent.state[name] \
-            if name in parent.state \
-            else {}
+        self.state = value_from_state(parent.state, name, {})
         self.regions = load_data(filename)
 
         self.setWindowTitle('Метеостанции РФ: Субъекты')

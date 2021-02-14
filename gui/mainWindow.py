@@ -1,25 +1,30 @@
 # coding: utf-8
 import sys
 
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QHBoxLayout, QApplication, QPushButton, QWidget, QVBoxLayout
+from PyQt5.QtWidgets import QApplication, QWidget
 
 from gui.foreign_choice import ForeignChoice
 from gui.region_choice import RegionChoice
 from gui.months_choice import MonthsChoice
 
 from logic.TableLoader import TableLoader
-from state.state_holder import State_Holder
+from state.stateholder import StateHolder
+
+from gui.gui_helper import value_from_state, btn_set_click, YearChoiceSpin, WdgtsHBox, WdgtsVBox
+from logic.constants import THIS_YEAR
 
 
-class GrandWindow(QWidget):
+class MainWindow(QWidget):
 
     def __init__(self, desktop):
         super().__init__()
 
-        self.holder = State_Holder()
+        self.holder = StateHolder()
         self.desktop = desktop
         self.state = self.holder.get_state()
+
+        self.start_year = value_from_state(self.state, 'START_YEAR', 2010)
+        self.end_year = value_from_state(self.state, 'END_YEAR', THIS_YEAR)
 
         self.ru_choice = RegionChoice('РФ', self)
         self.ru_choice.closing.connect(self.on_choice_close)
@@ -35,39 +40,20 @@ class GrandWindow(QWidget):
         self.setWindowTitle("Цветные таблицы")
 
     def init_ui(self):
-        btn_ru_choice = QPushButton('Метеостанции РФ')
-        btn_ru_choice.clicked.connect(lambda x: self.choose(self.ru_choice))
+        self.start_spin = self.start_year_choice()
+        self.end_spin = self.end_year_choice()
 
-        btn_kz_choice = QPushButton('Метеостанции РК')
-        btn_kz_choice.clicked.connect(lambda x: self.choose(self.kz_choice))
+        btn_ru_choice = btn_set_click('Метеостанции РФ', lambda x: self.choose(self.ru_choice))
+        btn_kz_choice = btn_set_click('Метеостанции РК', lambda x: self.choose(self.kz_choice))
+        btn_save = btn_set_click('Сохранить настройки', self.save)
+        btn_months_choice = btn_set_click('Выбрать месяца', lambda x: self.choose(self.months_choice))
+        btn_load = btn_set_click("Загрузить", self.on_loadBtn_clicked)
 
-        btn_save = QPushButton('Сохранить настройки')
-        btn_save.clicked.connect(self.save)
+        hBox_1 = WdgtsHBox(self.start_spin, self.end_spin)
+        hBox_2 = WdgtsHBox(btn_ru_choice, btn_kz_choice, btn_months_choice)
+        # hBox_3 = WdgtsHBox(btn_save, btn_load)
 
-        btn_months_choice = QPushButton('Выбрать месяца')
-        btn_months_choice.clicked.connect(lambda x: self.choose(self.months_choice))
-
-        btn_load = QPushButton("Загрузить")
-        btn_load.clicked.connect(self.on_loadBtn_clicked)
-
-        hBox = QHBoxLayout()
-        hBox.setAlignment(Qt.AlignHCenter)
-
-        hBox_1 = QHBoxLayout()
-        hBox_1.setAlignment(Qt.AlignHCenter)
-        hBox_1.addWidget(btn_ru_choice)
-        hBox_1.addWidget(btn_kz_choice)
-        hBox_1.addWidget(btn_months_choice)
-
-        hBox_2 = QHBoxLayout()
-        hBox_2.setAlignment(Qt.AlignHCenter)
-        hBox_2.addWidget(btn_save)
-        hBox_2.addWidget(btn_load)
-
-        vBox = QVBoxLayout()
-        vBox.setAlignment(Qt.AlignVCenter)
-        vBox.addLayout(hBox_1)
-        vBox.addLayout(hBox_2)
+        vBox = WdgtsVBox(hBox_1, hBox_2, btn_save, btn_load)
 
         self.setLayout(vBox)
 
@@ -81,19 +67,53 @@ class GrandWindow(QWidget):
     def save(self):
         self.holder.save_state()
 
+    def start_year_choice(self):
+        start_spin = YearChoiceSpin(1985, THIS_YEAR, self.start_year,
+                                    action=self.on_start_year_change)
+        start_spin.setPrefix('C ')
+        start_spin.setSuffix(' года')
+        return start_spin
+
+    def end_year_choice(self):
+        end_spin = YearChoiceSpin(1985, THIS_YEAR, self.end_year,
+                                  action=self.on_end_year_change)
+        end_spin.setPrefix('по ')
+        end_spin.setSuffix(' год')
+        return end_spin
+
+    def on_start_year_change(self):
+        self.start_year = self.start_spin.value()
+        self.valid_years()
+        self.state['START_YEAR'] = self.start_year
+
+    def on_end_year_change(self):
+        self.end_year = self.end_spin.value()
+        self.valid_years()
+        self.state['END_YEAR'] = self.end_year
+
+    def valid_years(self):
+        if self.start_year > self.end_year:
+            self.start_year, self.end_year = self.end_year, self.start_year
+            self.start_spin.setValue(self.start_year)
+            self.end_spin.setValue(self.end_year)
+
     def on_loadBtn_clicked(self):
         tl = TableLoader(self.holder)
-        for name, st_id in self.holder.chosen_ids_RU():
+
+        station_ids = self.holder.chosen_ids_RU()
+        station_ids.extend(self.holder.chosen_ids_FOREIGN('Казахстан'))
+
+        for name, st_id in station_ids:
             tl.load_all(name, st_id)
             tl.save_as_excel(name)
-        for name, st_id in self.holder.chosen_ids_FOREIGN('Казахстан'):
-            tl.load_all(name, st_id)
-            tl.save_as_excel(name)
+
+
+
 
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     desktop = QApplication.desktop()
-    window = GrandWindow(desktop)
+    window = MainWindow(desktop)
     window.show()
     sys.exit(app.exec_())

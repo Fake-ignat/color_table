@@ -2,7 +2,7 @@ import xlsxwriter as xl
 import statistics as stat
 import os
 from bs4 import BeautifulSoup
-from logic.constants import THIS_YEAR, FIRST_YEAR, LAST_YEAR, USERNAME, PASSWORD, ROOT_DIR
+from logic.constants import THIS_YEAR, USERNAME, PASSWORD, ROOT_DIR
 from logic.utils import create_browser, merge_cells, write_1st_col, apply_conditional_format, \
     cell_formats, write_data
 
@@ -12,15 +12,21 @@ class TableLoader:
 
     def __init__(self, holder):
         self.holder = holder
-        self.br = create_browser()
-        self.login()
-        self.years = range(FIRST_YEAR, LAST_YEAR + 1)
+
+        self.start_year = self.holder.start_year()
+        self.end_year = self.holder.end_year()
+        self.years = self.get_years_range()
+
         self.month_nums = self.holder.chosen_month_nums()
         self.month_names = self.holder.chosen_month_names()
 
-        self.years = range(FIRST_YEAR, LAST_YEAR + 1)
         self.data = self.create_default_buffer()
-        print(self.month_names)
+
+        self.br = create_browser()
+        self.login()
+
+
+
 
     def create_default_buffer(self):
         buffer = {}
@@ -29,6 +35,9 @@ class TableLoader:
                 m_y_date = f'{month:02d}.{year}'
                 buffer[m_y_date] = ("Н/Д", "Н/Д", "Н/Д")
         return buffer
+
+    def get_years_range(self):
+        return range(self.start_year, self.end_year + 1)
 
     def login(self):
         try:
@@ -125,8 +134,13 @@ class TableLoader:
     def save_as_excel(self, st_name):
         if not os.path.exists('Таблицы'):
             os.mkdir('Таблицы')
+
+        years_text = f'{self.start_year}-{self.end_year}' \
+            if self.start_year != self.end_year \
+            else f'{self.start_year}'
+
         # создаем книгу Excel
-        wb = xl.Workbook(f'{ROOT_DIR}/Таблицы/Цветная таблица {st_name} {FIRST_YEAR}-{LAST_YEAR}.xlsx')
+        wb = xl.Workbook(f'{ROOT_DIR}/Таблицы/Цветная таблица {st_name} {years_text}.xlsx')
         ws = wb.add_worksheet('Средние показатели')
 
         # задаем форматы

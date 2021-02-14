@@ -1,10 +1,10 @@
 # coding: utf-8
-import json, copy
+import json
 from logic.utils import load_data
 from logic.constants import ROOT_DIR
 
 
-class State_Holder():
+class StateHolder():
     filename = f'{ROOT_DIR}/state/app_state.json'
 
     def __init__(self):
@@ -44,4 +44,10 @@ class State_Holder():
 
     def chosen_month_nums(self):
         return [m for m in self.appState['Месяца']['month_names'].values()]
+
+    def start_year(self):
+        return self.appState['START_YEAR']
+
+    def end_year(self):
+        return self.appState['END_YEAR']
 
