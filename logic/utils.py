@@ -109,3 +109,7 @@ def cell_formats(workbook):
     prep_snow_format.set_border(style=1)
 
     return merge_format, temp_format, prep_snow_format
+
+
+def local_st_name(name):
+    return "-".join(name.split("-")[1:])

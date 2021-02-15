@@ -1,10 +1,11 @@
 import xlsxwriter as xl
 import statistics as stat
+import excel2img
 import os
 from bs4 import BeautifulSoup
 from logic.constants import THIS_YEAR, USERNAME, PASSWORD, ROOT_DIR
 from logic.utils import create_browser, merge_cells, write_1st_col, apply_conditional_format, \
-    cell_formats, write_data
+    cell_formats, write_data, local_st_name
 
 
 class TableLoader:
@@ -140,8 +141,10 @@ class TableLoader:
             else f'{self.start_year}'
 
         # создаем книгу Excel
-        wb = xl.Workbook(f'{ROOT_DIR}/Таблицы/Цветная таблица {st_name} {years_text}.xlsx')
-        ws = wb.add_worksheet('Средние показатели')
+        workbook_name = f'{ROOT_DIR}/Таблицы/Цветная таблица {st_name} {years_text}'
+        worksheet_name = 'Средние показатели'
+        wb = xl.Workbook(workbook_name + '.xlsx')
+        ws = wb.add_worksheet(worksheet_name)
 
         # задаем форматы
         formats = cell_formats(wb)
@@ -168,6 +171,13 @@ class TableLoader:
         # закрываем книгу Excel
         wb.close()
 
+        lst_name = local_st_name(st_name)
+
+        try:
+            make_xlsx_screenshot(workbook_name, worksheet_name, lst_name)
+        except Exception as e:
+            print(e)
+
     def print_data(self):
         for d, values in self.data.items():
             t, p, h = values
@@ -181,3 +191,9 @@ class TableLoader:
                 m, y = map(int, d.split('.'))
                 f.write(f'{m:02d}.{y} {t} {p} {h}\n')
 
+
+def make_xlsx_screenshot(wb_name, ws_name, st_name):
+    if not os.path.exists('Скриншоты'):
+        os.mkdir('Скриншоты')
+    screenshot_name = f'{ROOT_DIR}/Скриншоты/{st_name}.png'
+    excel2img.export_img(f"{wb_name}.xlsx", screenshot_name, ws_name, None)
