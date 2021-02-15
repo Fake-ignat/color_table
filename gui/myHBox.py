@@ -1,6 +1,6 @@
 # coding: utf-8
 from PyQt5.QtWidgets import (QCheckBox, QHBoxLayout, QPushButton, QSizePolicy)
-
+from logic.constants import BTN_COLOR, CHECKED_COLOR
 
 class MyHBox(QHBoxLayout):
     def __init__(self, parent, region):
@@ -12,13 +12,15 @@ class MyHBox(QHBoxLayout):
         self.checkBox = QCheckBox()
         self.checkBox.setTristate(True)
         self.checkBox.clicked.connect(self.on_cb_clicked)
+        self.checkBox.stateChanged.connect(self.on_cb_changed)
         self.addWidget(self.checkBox)
 
-        btn = QPushButton(region)
-        btn.clicked.connect(lambda:
+        self.btn = QPushButton(region)
+        self.btn.setStyleSheet(f'background-color: {BTN_COLOR}; font: bold 10pt/6pt arial')
+        self.btn.clicked.connect(lambda:
                             self.parent.on_station_choice_clicked(region, self.stations))
-        btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-        self.addWidget(btn)
+        self.btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        self.addWidget(self.btn)
 
     def on_cb_clicked(self):
         if self.checkBox.checkState():
@@ -36,3 +38,8 @@ class MyHBox(QHBoxLayout):
 
     def uncheck_all(self):
         self.parent.state.pop(self.name)
+
+    def on_cb_changed(self):
+        color = CHECKED_COLOR if self.checkBox.isChecked() else BTN_COLOR
+        self.btn.setStyleSheet(f'background-color: {color}; '
+                               f'font: bold 10pt/6pt arial')

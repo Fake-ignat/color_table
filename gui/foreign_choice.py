@@ -12,14 +12,17 @@ class ForeignChoice(StationChoice):
     base_data = load_data(filename)
     limit = 50
     small_col = 12
-    big_col =25
+    big_col = 24
 
     def __init__(self, name, parent):
         super().__init__(name, self.base_data, parent)
 
         self.setWindowTitle(f'Метеостанции {self.name}')
         self.move(50, 170)
-        self.setFixedWidth(parent.desktop.width() - 100)
+        desk_width = parent.desktop.width()
+        if desk_width > 1920:
+            desk_width = desk_width // 2
+        self.setFixedWidth(desk_width - 100)
         self.init_ui()
 
         self.render_checkBoxes()

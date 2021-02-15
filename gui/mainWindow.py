@@ -11,7 +11,7 @@ from logic.TableLoader import TableLoader
 from state.stateholder import StateHolder
 
 from gui.gui_helper import value_from_state, btn_set_click, YearChoiceSpin, WdgtsHBox, WdgtsVBox
-from logic.constants import THIS_YEAR
+from logic.constants import THIS_YEAR, WIDGET_STYLE
 
 
 class MainWindow(QWidget):
@@ -36,6 +36,7 @@ class MainWindow(QWidget):
         self.months_choice.closing.connect(self.on_choice_close)
 
         self.init_ui()
+        self.setStyleSheet(WIDGET_STYLE)
         self.resize(430, 280)
         self.setWindowTitle("Цветные таблицы")
 

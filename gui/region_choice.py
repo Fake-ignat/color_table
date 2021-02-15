@@ -10,6 +10,7 @@ from gui.station_choice import StationChoice
 from PyQt5.QtWidgets import (QHBoxLayout, QVBoxLayout,QWidget, QApplication)
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtGui import QCloseEvent
+from logic.constants import WIDGET_STYLE
 
 class RegionChoice(QWidget):
     closing = pyqtSignal()
@@ -24,8 +25,9 @@ class RegionChoice(QWidget):
 
         self.setWindowTitle('Метеостанции РФ: Субъекты')
         self.init_ui()
+        self.setStyleSheet(WIDGET_STYLE)
         self.render_checkBoxes()
-        self.move(200, 250)
+        self.move(50, 250)
         self.station_choice = None
 
     def init_ui(self):
@@ -40,7 +42,7 @@ class RegionChoice(QWidget):
         vBox = QVBoxLayout()
         for region in self.regions:
             vBox.addLayout(MyHBox(self, region))
-            if vBox.count() >= 13:
+            if vBox.count() >= 10:
                 layout.addLayout(vBox)
                 layout.addWidget(separator('V'))
                 vBox = QVBoxLayout()
@@ -79,22 +81,3 @@ class RegionChoice(QWidget):
 
     def modify_parent_state(self):
         self.parent.state[self.name] = self.state
-
-test_state = {
-    'Смоленская область': dict(stations={
-        'Гагарин': '27507',
-        'Рославль': '26882',
-        'Рудня': '26675',
-        'Смоленск': '26781'},
-        isChecked=1),
-    'Мордовия': dict(stations={
-        'Саранск': '27760',
-        'Темников': '27752',
-        'Торбеево': '27758'},
-        isChecked=1)}
-
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    choice = RegionChoice(test_state)
-    choice.show()
-    sys.exit(app.exec_())

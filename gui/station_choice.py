@@ -1,18 +1,17 @@
-from gui.gui_helper import separator, create_ok_cancel_btnBox, value_from_state
+from gui.gui_helper import separator, create_ok_cancel_btnBox, value_from_state, ChoiceCheckBox
 from PyQt5.QtWidgets import (QCheckBox, QHBoxLayout, QVBoxLayout, QWidget)
 from PyQt5.QtGui import QCloseEvent
 from PyQt5.QtCore import pyqtSignal
+from logic.constants import WIDGET_STYLE, CHECKED_COLOR, CB_COLOR
 from copy import deepcopy
 
 
 class StationChoice(QWidget):
     closing = pyqtSignal()
 
-
     limit = 50
     small_col = 12
     big_col = 25
-
 
     def __init__(self, name, base_data, parent, choice_key='stations'):
         super().__init__()
@@ -27,6 +26,7 @@ class StationChoice(QWidget):
             default_value=deepcopy(self.default_state()))
 
         self.init_ui()
+        self.setStyleSheet(WIDGET_STYLE)
         self.render_checkBoxes()
 
         self.setWindowTitle(f'Метеостанции {self.name}')
@@ -46,13 +46,16 @@ class StationChoice(QWidget):
 
         amount = len(self.base_data)
         column_size = self.small_col if amount <= self.limit else self.big_col
-
-        for station, id in self.base_data.items():
-            vBox.addWidget(QCheckBox(station))
-            if vBox.count() >= column_size:
-                layout.addLayout(vBox)
-                layout.addWidget(separator('V'))
-                vBox = QVBoxLayout()
+        try:
+            for station, id in self.base_data.items():
+                checkBox = ChoiceCheckBox(station)
+                vBox.addWidget(checkBox)
+                if vBox.count() >= column_size:
+                    layout.addLayout(vBox)
+                    layout.addWidget(separator('V'))
+                    vBox = QVBoxLayout()
+        except Exception as e:
+            print(e)
         layout.addLayout(vBox)
         return layout
 
