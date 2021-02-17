@@ -1,6 +1,6 @@
 # coding: utf-8
 from PyQt5.QtWidgets import (QCheckBox, QHBoxLayout, QPushButton, QSizePolicy)
-from logic.constants import BTN_COLOR, CHECKED_COLOR
+from constants import BTN_COLOR, CHECKED_COLOR
 
 class MyHBox(QHBoxLayout):
     def __init__(self, parent, region):

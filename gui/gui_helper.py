@@ -2,7 +2,7 @@
 from PyQt5.QtWidgets import (QHBoxLayout, QPushButton, QSizePolicy, QFrame, QSpinBox,
                              QVBoxLayout, QLayout, QCheckBox)
 from PyQt5 import QtCore
-from logic.constants import BTN_COLOR, SPIN_COLOR, CHECKED_COLOR, CB_COLOR
+from constants import BTN_COLOR, SPIN_COLOR, CHECKED_COLOR, CB_COLOR
 
 
 class YearChoiceSpin(QSpinBox):

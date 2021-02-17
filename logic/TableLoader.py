@@ -3,7 +3,7 @@ import statistics as stat
 import excel2img
 import os
 from bs4 import BeautifulSoup
-from logic.constants import THIS_YEAR, USERNAME, PASSWORD, ROOT_DIR
+from constants import THIS_YEAR, USERNAME, PASSWORD, ROOT_DIR
 from logic.utils import create_browser, merge_cells, write_1st_col, apply_conditional_format, \
     cell_formats, write_data, local_st_name
 

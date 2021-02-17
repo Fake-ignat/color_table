@@ -2,8 +2,8 @@
 from logic.utils import load_data, create_browser
 from mechanize import Browser
 from bs4 import BeautifulSoup
-from logic.constants import (STATION_LIST_DIR_KZ, STATION_LIST_DIR_RU, ROOT_DIR, USERNAME, PASSWORD)
-import re, json
+from constants import (STATION_LIST_DIR_KZ, STATION_LIST_DIR_RU, ROOT_DIR, USERNAME, PASSWORD)
+import re, json, ast
 
 
 class Finder():
@@ -96,14 +96,15 @@ class Finder():
 
 class Coordinator():
     def __init__(self):
-        self.regions = load_data(STATION_LIST_DIR_RU)
-        print(self.regions)
+        # self.regions = load_data('../stations/station_ids full.json')
+        # print(self.regions)
         self.br = create_browser()
-        self.login()
-        self.update_regions()
+        #self.login()
+        #self.update_regions()
 
     def get_URL(self, id):
-        return f'http://www.pogodaiklimat.ru/summary/{id}.htm'
+        # return f'http://www.pogodaiklimat.ru/summary/{id}.htm'
+        return f'https://time-in.ru/time/{id}'
 
     def login(self):
         try:
@@ -115,6 +116,13 @@ class Coordinator():
         self.br["password"] = PASSWORD
         self.br.submit()
 
+    def get_city_id(self, name):
+        response = self.br.open(f'https://time-in.ru/time?search={name}&ajax=true').get_data()
+        data = ast.literal_eval(response.decode("UTF-8"))
+        return data[0]["id"] \
+            if data \
+            else None
+
     def get_tag_text(self, url, tag):
         html = self.br.open(url)
         soup = BeautifulSoup(html, "lxml")
@@ -122,7 +130,7 @@ class Coordinator():
         return h2.text
 
     def parse_coords(self, text):
-        pattern = r'(\d{2}.\d{2})°[шд]'
+        pattern = r'(\d+\.\d+)°[шд]'
         match = re.findall(pattern, text)
         lat = match[0] if match else None
         long = match[1] if match else None
@@ -136,24 +144,58 @@ class Coordinator():
                        5),
                    coords)
 
-    def updated_station_data(self, id):
+    def updated_station_data(self, station_id, id):
+        if id:
+            url = self.get_URL(id)
+            html = self.br.open(url)
+            soup = BeautifulSoup(html, "lxml")
+            tbody = soup.find('tbody')
+            try:
+                trlat, trlong = tbody.find_all('tr')[3:4]
+                lat = float(trlat.find_all('td')[1].text())
+                long = float(trlong.find_all('td')[1].text())
+                # coord = self.parse_coords(text)
+                return dict(id=station_id, coord=[lat, long])
+            except Exception:
+                print(station_id, id)
+        else:
+            return
+
+    def get_soup(self, id):
+        lat, long = None, None
         url = self.get_URL(id)
-        text = self.get_tag_text(url, 'h2')
-        coord = self.parse_coords(text)
-        return dict(id=id, coord=coord)
+        html = self.br.open(url)
+        soup = BeautifulSoup(html, "lxml")
+        table = soup.find('table')
+        rows = table.find_all('tr')
+        for row in rows:
+            k, v = row.find_all('td')
+            if k == 'Долгота':
+                long = float(v.text())
+            if k == 'Широта':
+                lat = float(v.text())
+            print(k, v)
+        return lat, long
+
 
     def update_regions(self):
         for region, station_data in self.regions.items():
-            for station, id in station_data.items():
+            for station, station_id in station_data.items():
                 print(f'{region} - {station}')
-                new_data = self.updated_station_data(id)
-                self.regions[region][station] = new_data
+                city_id = self.get_city_id(station)
+                if city_id:
+                    new_data = self.updated_station_data(station_id, city_id)
+                    self.regions[region][station] = new_data
 
     def save_data(self):
-        filename = f'{ROOT_DIR}/stations/ru_meteost_coords.json'
+        filename = STATION_LIST_DIR_RU
         with open(filename, 'w') as f:
             json.dump(self.regions, f, indent=2, ensure_ascii=False)
 
+    def extract_from_html(self, html):
+        print(html)
 
-coordinator = Coordinator()
-coordinator.save_data()
+
+coo = Coordinator()
+id = coo.get_city_id('Киров')
+print(coo.get_soup(id))

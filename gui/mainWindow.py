@@ -11,7 +11,7 @@ from logic.TableLoader import TableLoader
 from state.stateholder import StateHolder
 
 from gui.gui_helper import value_from_state, btn_set_click, YearChoiceSpin, WdgtsHBox, WdgtsVBox
-from logic.constants import THIS_YEAR, WIDGET_STYLE
+from constants import THIS_YEAR, WIDGET_STYLE
 
 
 class MainWindow(QWidget):

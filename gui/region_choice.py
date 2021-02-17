@@ -1,16 +1,14 @@
-import sys
-
 from logic.utils import load_data
-from logic.constants import STATION_LIST_DIR_RU as filename
+from constants import STATION_LIST_DIR_RU as filename
 
 from gui.gui_helper import separator, create_ok_cancel_btnBox, value_from_state
 from gui.myHBox import MyHBox
 from gui.station_choice import StationChoice
 
-from PyQt5.QtWidgets import (QHBoxLayout, QVBoxLayout,QWidget, QApplication)
+from PyQt5.QtWidgets import (QHBoxLayout, QVBoxLayout, QWidget)
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtGui import QCloseEvent
-from logic.constants import WIDGET_STYLE
+from constants import WIDGET_STYLE
 
 class RegionChoice(QWidget):
     closing = pyqtSignal()

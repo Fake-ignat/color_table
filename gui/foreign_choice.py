@@ -2,7 +2,7 @@ from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QCheckBox
 
 from gui.station_choice import StationChoice
-from logic.constants import STATION_LIST_DIR_KZ as filename
+from constants import STATION_LIST_DIR_KZ as filename
 from logic.utils import load_data
 
 

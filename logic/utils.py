@@ -1,6 +1,6 @@
 import json
 from mechanize import Browser
-from logic.constants import MERGE_FORMAT, TEMP_FORMAT, PREP_SNOW_FORMAT
+from constants import MERGE_FORMAT, TEMP_FORMAT, PREP_SNOW_FORMAT
 
 
 def create_browser():

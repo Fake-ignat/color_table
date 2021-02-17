@@ -2,7 +2,7 @@ from gui.gui_helper import separator, create_ok_cancel_btnBox, value_from_state,
 from PyQt5.QtWidgets import (QCheckBox, QHBoxLayout, QVBoxLayout, QWidget)
 from PyQt5.QtGui import QCloseEvent
 from PyQt5.QtCore import pyqtSignal
-from logic.constants import WIDGET_STYLE, CHECKED_COLOR, CB_COLOR
+from constants import WIDGET_STYLE
 from copy import deepcopy
 
 
