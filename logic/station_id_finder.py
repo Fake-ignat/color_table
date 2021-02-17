@@ -1,9 +1,8 @@
 # coding:cp1251
-from logic.utils import load_data, create_browser
 from mechanize import Browser
 from bs4 import BeautifulSoup
-from constants import (STATION_LIST_DIR_KZ, STATION_LIST_DIR_RU, ROOT_DIR, USERNAME, PASSWORD)
-import re, json, ast
+from constants import (STATION_LIST_DIR_KZ, STATION_LIST_DIR_RU)
+import json
 
 
 class Finder():
@@ -92,96 +91,5 @@ class Finder():
         filename = STATION_LIST_DIR_RU if self.country == 'RU' else STATION_LIST_DIR_KZ
         with open(filename, 'w') as f:
             json.dump(self.station_ids, f, indent=2, ensure_ascii=False)
-
-
-class Coordinator():
-    def __init__(self):
-        self.regions = load_data('../stations/station_ids full.json')
-        # print(self.regions)
-        self.br = create_browser()
-        self.update_regions()
-
-    def get_URL(self, id):
-        return f'https://time-in.ru/time/{id}'
-
-    def get_city_id(self, name):
-        try:
-            response = self.br.open(f'https://time-in.ru/time?search={name}&ajax=true').get_data()
-            data = ast.literal_eval(response.decode("UTF-8"))
-            for note in data:
-                description = note["description"]
-                if "Россия" in description:
-                    return data[0]["id"]
-        except Exception:
-            print(Exception)
-            return
-
-    def get_tag_text(self, url, tag):
-        html = self.br.open(url)
-        soup = BeautifulSoup(html, "lxml")
-        h2 = soup.find(tag)
-        return h2.text
-
-    def parse_coords(self, text):
-        pattern = r'(\d+\.\d+)°[шд]'
-        match = re.findall(pattern, text)
-        lat = match[0] if match else None
-        long = match[1] if match else None
-        lat, long = self.convert_coord(map(float, (lat, long)))
-        return lat, long
-
-    def convert_coord(self, coords):
-        return map(lambda x:
-                   round(
-                       int(x) + (x - int(x)) / 60,
-                       5),
-                   coords)
-
-    def updated_station_data(self, station_id, id):
-        if id:
-            url = self.get_URL(id)
-            html = self.br.open(url)
-            soup = BeautifulSoup(html, "lxml")
-            try:
-                return dict(id=station_id, location=self.get_loc(soup))
-            except Exception:
-                print(Exception)
-
-    @staticmethod
-    def get_loc(soup):
-        lat, long = None, None
-
-        rows = soup.find('table').find_all('tr')
-        for row in rows:
-            k, v = map(lambda x: x.text, row.find_all('td'))
-            if k == 'Долгота':
-                long = float(v)
-            if k == 'Широта':
-                lat = float(v)
-        return [lat, long]
-
-    def update_regions(self):
-        for region, station_data in self.regions.items():
-            for station, station_id in station_data.items():
-                city_id = self.get_city_id(station)
-                if city_id:
-                    new_data = self.updated_station_data(station_id, city_id)
-                    self.regions[region][station] = new_data
-                    print(f'{region} - {station}: координаты обновлены!')
-                else:
-                    self.regions[region][station] = dict(id=station_id, location=None)
-                    print(f'{region} - {station}: ненаход')
-
-    def save_data(self):
-        filename = '../stations/ru_meteo_locaton.json'
-        with open(filename, 'w') as f:
-            json.dump(self.regions, f, indent=2, ensure_ascii=False)
-
-    def extract_from_html(self, html):
-        print(html)
-
-
-coo = Coordinator()
-coo.save_data()
 
 # TODO https://snipp.ru/tools/address-coord

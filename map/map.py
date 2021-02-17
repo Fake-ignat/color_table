@@ -2,7 +2,7 @@ import folium
 from constants import START_LOC, START_ZOOM
 from logic.utils import load_data
 
-filename = "../stations/ru_meteo_locaton.json"
+filename = "../stations/ru_meteo_yandex_locatons.json"
 
 
 class MyMap:
@@ -20,7 +20,7 @@ class MyMap:
         coords = []
         for region, stations in self.data.items():
             for station, vals in stations.items():
-                loc = vals["location"]
+                loc = vals["location"][::-1]
                 if loc:
                     coords.append((station, loc))
         return coords
