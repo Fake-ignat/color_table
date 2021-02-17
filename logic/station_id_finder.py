@@ -96,32 +96,25 @@ class Finder():
 
 class Coordinator():
     def __init__(self):
-        # self.regions = load_data('../stations/station_ids full.json')
+        self.regions = load_data('../stations/station_ids full.json')
         # print(self.regions)
         self.br = create_browser()
-        #self.login()
-        #self.update_regions()
+        self.update_regions()
 
     def get_URL(self, id):
-        # return f'http://www.pogodaiklimat.ru/summary/{id}.htm'
         return f'https://time-in.ru/time/{id}'
 
-    def login(self):
-        try:
-            self.br.open("http://www.pogodaiklimat.ru/login.php")
-        except:
-            print("[!]Critical, could not open page.")
-        self.br.form = list(self.br.forms())[0]
-        self.br["username"] = USERNAME
-        self.br["password"] = PASSWORD
-        self.br.submit()
-
     def get_city_id(self, name):
-        response = self.br.open(f'https://time-in.ru/time?search={name}&ajax=true').get_data()
-        data = ast.literal_eval(response.decode("UTF-8"))
-        return data[0]["id"] \
-            if data \
-            else None
+        try:
+            response = self.br.open(f'https://time-in.ru/time?search={name}&ajax=true').get_data()
+            data = ast.literal_eval(response.decode("UTF-8"))
+            for note in data:
+                description = note["description"]
+                if "Россия" in description:
+                    return data[0]["id"]
+        except Exception:
+            print(Exception)
+            return
 
     def get_tag_text(self, url, tag):
         html = self.br.open(url)
@@ -149,46 +142,38 @@ class Coordinator():
             url = self.get_URL(id)
             html = self.br.open(url)
             soup = BeautifulSoup(html, "lxml")
-            tbody = soup.find('tbody')
             try:
-                trlat, trlong = tbody.find_all('tr')[3:4]
-                lat = float(trlat.find_all('td')[1].text())
-                long = float(trlong.find_all('td')[1].text())
-                # coord = self.parse_coords(text)
-                return dict(id=station_id, coord=[lat, long])
+                return dict(id=station_id, location=self.get_loc(soup))
             except Exception:
-                print(station_id, id)
-        else:
-            return
+                print(Exception)
 
-    def get_soup(self, id):
+    @staticmethod
+    def get_loc(soup):
         lat, long = None, None
-        url = self.get_URL(id)
-        html = self.br.open(url)
-        soup = BeautifulSoup(html, "lxml")
-        table = soup.find('table')
-        rows = table.find_all('tr')
-        for row in rows:
-            k, v = row.find_all('td')
-            if k == 'Долгота':
-                long = float(v.text())
-            if k == 'Широта':
-                lat = float(v.text())
-            print(k, v)
-        return lat, long
 
+        rows = soup.find('table').find_all('tr')
+        for row in rows:
+            k, v = map(lambda x: x.text, row.find_all('td'))
+            if k == 'Долгота':
+                long = float(v)
+            if k == 'Широта':
+                lat = float(v)
+        return [lat, long]
 
     def update_regions(self):
         for region, station_data in self.regions.items():
             for station, station_id in station_data.items():
-                print(f'{region} - {station}')
                 city_id = self.get_city_id(station)
                 if city_id:
                     new_data = self.updated_station_data(station_id, city_id)
                     self.regions[region][station] = new_data
+                    print(f'{region} - {station}: координаты обновлены!')
+                else:
+                    self.regions[region][station] = dict(id=station_id, location=None)
+                    print(f'{region} - {station}: ненаход')
 
     def save_data(self):
-        filename = STATION_LIST_DIR_RU
+        filename = '../stations/ru_meteo_locaton.json'
         with open(filename, 'w') as f:
             json.dump(self.regions, f, indent=2, ensure_ascii=False)
 
@@ -197,5 +182,6 @@ class Coordinator():
 
 
 coo = Coordinator()
-id = coo.get_city_id('Киров')
-print(coo.get_soup(id))
+coo.save_data()
+
+# TODO https://snipp.ru/tools/address-coord

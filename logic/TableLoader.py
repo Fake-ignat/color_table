@@ -26,9 +26,6 @@ class TableLoader:
         self.br = create_browser()
         self.login()
 
-
-
-
     def create_default_buffer(self):
         buffer = {}
         for year in self.years:
