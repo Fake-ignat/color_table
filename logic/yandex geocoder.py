@@ -11,7 +11,7 @@ class YandexGeocoder:
 
     def get_location(self, station, region=''):
         try:
-            lat, long = map(float, self.client.coordinates(f"{region} {station}"))
+            long, lat = map(float, self.client.coordinates(f"{region} {station}"))
             return [lat, long]
         except Exception:
             print(Exception)
@@ -26,7 +26,7 @@ class YandexGeocoder:
                     print(f'{region} - {station}: координаты обновлены!')
                 else:
                     self.regions[region][station] = dict(id=station_id, location=None)
-                    print(f'{region} - {station}: ненаход')
+                    print(f'{region} - {station}: ---------------------------------------------ненаход')
 
     def save_data(self):
         filename = '../stations/ru_meteo_yandex_locatons.json'

@@ -20,7 +20,7 @@ class MyMap:
         coords = []
         for region, stations in self.data.items():
             for station, vals in stations.items():
-                loc = vals["location"][::-1]
+                loc = vals["location"]
                 if loc:
                     coords.append((station, loc))
         return coords
@@ -34,7 +34,7 @@ def create_marker(name, loc):
                                popup=f'{name} {loc[0]} {loc[1]}',
                                color='black',
                                fill_color='yellow',
-                               fill_opacity=0.9)
+                               fill_opacity=0.5)
 
 
 my_map = MyMap()
